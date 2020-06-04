@@ -1,16 +1,22 @@
 pipeline{
     tools{
-        jdk 'myjava'
-        maven 'mymaven'
+         maven 'mymaven'
     }
-    
-    agent none
-    stages{
-            stage('Compile'){
+    agent any
+        stages{
+            stage('checkout'){ 
+                agent any
+                steps{
+                    git 'https://github.com/mahidev29/Devopsclasscodes.git'
+            }
+                     }
+            
+             stage('Compile'){
                 agent any
                 steps{
                     sh 'mvn compile'
                 }
+                
             }
             stage('CodeReview'){
                 agent any
@@ -24,22 +30,17 @@ pipeline{
                 }
             }
             stage('UnitTest'){
-                agent {label 'win_slave'}
+                agent any
                 steps{
-                    git 'https://github.com/devops-trainer/DevOpsClassCodes.git'
-                    bat 'mvn test'
-                }
-                post{
-                    always{
-                        junit 'target/surefire-reports/*.xml'
-                    }
+                    sh 'mvn test'
                 }
                 
             }
-            stage('MetricCheck'){
-                agent any
+            stage('MetriCheck'){
+                 agent {label 'Win_slave1'}
                 steps{
-                    sh 'mvn cobertura:cobertura -Dcobertura.report.format=xml'
+                    git 'https://github.com/mahidev29/Devopsclasscodes.git'
+                    bat 'mvn cobertura:cobertura -Dcobertura.report.format=xml'
                 }
                 post{
                     always{
@@ -53,5 +54,8 @@ pipeline{
                     sh 'mvn package'
                 }
             }
-    }
-}
+            
+        }
+    
+    }        
+    
